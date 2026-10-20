@@ -30,3 +30,12 @@ measured facts.
 No third-party description was used to assert Toccata activation, current
 mainnet covenant support, a native stablecoin, a throughput number, or a
 deployable transaction format. Verify all against a pinned node before use.
+
+## GitHub CI tooling
+
+- https://github.com/actions/checkout
+- https://github.com/actions/setup-python
+
+The official READMEs currently show v7 usage for both actions. The workflow
+uses those major versions, read-only repository permission, an explicit
+Ubuntu 24.04 runner, and no persisted checkout credentials.
