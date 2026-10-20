@@ -9,6 +9,7 @@ from .engine import Engine
 from .reserves import LinearReserve, ConstantProductPool
 from .treasury import Treasury, EPOCH_SECONDS
 from .types import BASE, QUOTE
+from . import __version__
 
 
 def demo():
@@ -27,7 +28,7 @@ def demo():
         split = treasury.allocate_margin(1_000_000)
         treasury.begin_epoch(0)
         spent = treasury.drip_opex(EPOCH_SECONDS, 12_500)
-        return dict(version="0.1.0", mode="simulation", receipt=receipt,
+        return dict(version=__version__, mode="simulation", receipt=receipt,
                     audit=engine.audit(), state=engine.state(),
                     independent_models={"curve": {"paid": paid, "refunded": refunded, "supply": curve.supply, "reserve": curve.reserve},
                                         "amm_quote_out": pool.swap("base", 10),
@@ -35,20 +36,49 @@ def demo():
                     live_broadcast=False)
 
 
+def perps_demo():
+    from .perps import PerpetualEngine
+    with tempfile.TemporaryDirectory(prefix="static-perps-demo-") as folder:
+        engine = PerpetualEngine(Path(folder) / "perps.sqlite")
+        engine.fund_account("deposit-long", "alice", 500000, 0)
+        engine.fund_account("deposit-short", "bob", 500000, 0)
+        engine.fund_insurance("insurance", 50000, 0)
+        engine.publish_oracle("oracle-1", 10000, 10000, 0, 0)
+        opened = engine.open_pair("pair-1", "alice", "bob", 10, 20000, 20000, 0)
+        pair_id = opened["result"]["pair_id"]
+        initial_risk = engine.risk(pair_id, 0)
+        engine.publish_oracle("oracle-2", 10000, 10000, 3600, 3600)
+        funding = engine.settle_funding("funding-1", 1, 10, 3600)
+        engine.top_up("top-up-1", pair_id, "bob", 5000, 3600)
+        engine.publish_oracle("oracle-3", 12500, 12500, 3601, 3601)
+        liquidation = engine.liquidate("liquidation-1", pair_id, 3601)
+        return dict(version=__version__, mode="simulation", opened=opened,
+                    initial_risk=initial_risk, funding=funding, liquidation=liquidation,
+                    audit=engine.audit(), state=engine.state(), live_broadcast=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description="STATIC local reference engine: simulated assets only")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("demo", help="run an isolated complete example")
+    commands.add_parser("perps-demo", help="run a simulated long/short, funding, and liquidation example")
     serve = commands.add_parser("serve", help="start the loopback operator API")
     serve.add_argument("--db", default="static-sim.sqlite")
     serve.add_argument("--port", type=int, default=8787)
     audit = commands.add_parser("audit", help="check ledger and receipt integrity")
     audit.add_argument("--db", required=True)
+    perp_audit = commands.add_parser("perps-audit", help="check perpetual collateral and receipt integrity")
+    perp_audit.add_argument("--db", required=True)
     args = parser.parse_args()
     if args.command == "demo":
         print(json.dumps(demo(), indent=2))
+    elif args.command == "perps-demo":
+        print(json.dumps(perps_demo(), indent=2))
     elif args.command == "audit":
         print(json.dumps(Engine(args.db).audit(), indent=2))
+    elif args.command == "perps-audit":
+        from .perps import PerpetualEngine
+        print(json.dumps(PerpetualEngine(args.db).audit(), indent=2))
     else:
         from .api import make_server
         token = os.environ.get("STATIC_SIM_TOKEN") or secrets.token_urlsafe(32)

@@ -1,6 +1,6 @@
 # Project checkpoint
 
-Version: 0.1.0
+Version: 0.2.0
 
 ## Completed
 
@@ -14,6 +14,20 @@ Version: 0.1.0
   concurrency, injected faults, restart recovery, tampering, slippage and
   treasury limits. See VALIDATION.txt for the executed test results.
 - Included CI configuration, source observations, design decisions and handoff.
+- Added persistent paired linear perpetuals with isolated collateral, initial
+  and maintenance margin, mark-based PnL, margin top-ups and full-pair close.
+- Added bounded mock index/mark snapshots, sequential funding, modeled full-pair
+  liquidation, finite insurance and explicit uncovered-loss payout haircuts.
+- Added perpetual mutation retries, complete state commitments, HTTP endpoints,
+  a worked demo and a risk specification. The full suite now has 89 tests.
+
+## Next perpetuals milestone
+
+Replace operator-paired entries with limit-price order matching; implement
+partial reductions with exact realized PnL and margin release. Then specify
+authenticated price/rate inputs, funding scheduling and executable liquidation
+slippage. The current simulator closes both sides of a pair at a mock mark;
+it is not a production derivatives venue. See PERPETUALS.md.
 
 ## Next milestone: one verifiable Kaspa intake buffer
 
@@ -43,9 +57,9 @@ Version: 0.1.0
 | 6 | User application and wallet flow | Signed intents, readable receipts, scoped permissions, no seed entry |
 | 7 | External integration and launch readiness | Reviewed bridge/oracle/stablecoin model; independent audits; bounded operational controls |
 
-Perpetuals, cross-chain collateral and broad production access follow a separate
-risk specification. They are not hidden launch dependencies for this first
-spot reference engine.
+The perpetuals accounting increment is now specified and implemented locally.
+Cross-chain collateral and broad production access remain separate milestones.
+Neither ledger is connected to real funds or deployed covenant execution.
 
 ## Handoff
 

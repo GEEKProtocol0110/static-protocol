@@ -39,3 +39,16 @@ deployable transaction format. Verify all against a pinned node before use.
 The official READMEs currently show v7 usage for both actions. The workflow
 uses those major versions, read-only repository permission, an explicit
 Ubuntu 24.04 runner, and no persisted checkout credentials.
+
+## Perpetuals concepts
+
+- https://hyperliquid.gitbook.io/hyperliquid-docs/trading/margining
+- https://hyperliquid.gitbook.io/hyperliquid-docs/trading/liquidations
+- https://hyperliquid.gitbook.io/hyperliquid-docs/trading/funding
+
+Primary venue documentation was reviewed for isolated margin, maintenance-based
+liquidation and peer-to-peer funding, including the distinction between index
+and mark prices in funding calculations. STATIC's risk parameters, paired
+cash-settlement model, discrete rate input and loss allocation are its own
+documented simulation choices; this implementation does not reproduce that
+venue's execution, oracle, margin tiers or liquidation mechanism.

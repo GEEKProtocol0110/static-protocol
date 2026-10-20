@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml"><img alt="Reference engine checks" src="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml/badge.svg?branch=main&amp;event=push"></a>
   <img alt="Python 3.11 and later" src="https://img.shields.io/badge/Python-3.11%2B-3776ab">
-  <img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-25b7aa">
+  <img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-25b7aa">
   <img alt="Simulation only" src="https://img.shields.io/badge/stage-simulation-d4a64a">
 </p>
 
@@ -18,16 +18,17 @@
 
 # STATIC Protocol
 
-**An executable foundation for batch settlement, continuous reserves, and treasury research on Kaspa.**
+**An executable foundation for perpetuals and settlement research on Kaspa.**
 
 STATIC models the order-intake, batch-settlement, reserve, and treasury ideas in
-the supplied *STATIC Protocol Technical Whitepaper v1.0*. This first build makes
-the accounting executable and testable. It does not accept funds, issue tokens,
+the supplied *STATIC Protocol Technical Whitepaper v1.0*. Version 0.2 adds a
+persistent, paired perpetuals simulator with isolated collateral, funding,
+and liquidation accounting. It does not accept funds, issue tokens,
 create wallets, or broadcast Kaspa transactions.
 
 | Today | Next milestone |
 | --- | --- |
-| Local reference engine with 48 passing tests, persistent accounting, and a JSON operator API | A compiled intake covenant validated against a pinned Kaspa toolchain |
+| Spot foundation and paired perpetuals simulator; 89 passing tests; persistent accounting and a local operator API | Perpetual order matching and partial reductions; separately, a compiled intake covenant |
 
 The project is in the **reference implementation** stage. The economic models
 and protocol integration gates are documented so contributors can distinguish
@@ -41,6 +42,7 @@ Requires Python 3.11 or later. No third-party runtime packages are needed.
 git clone https://github.com/GEEKProtocol0110/static-protocol.git
 cd static-protocol
 python -m static_protocol demo
+python -m static_protocol perps-demo
 python -m unittest discover -s tests -v
 ```
 
@@ -54,6 +56,11 @@ The demo creates an isolated temporary ledger, funds two simulated accounts,
 places orders, settles a batch, checks accounting, and exercises independent
 curve, AMM, and treasury models. It prints a JSON receipt and result. Every demo
 run starts clean; its temporary database is removed afterward.
+
+The perpetuals demo opens a matched long and short, accrues funding, adds margin,
+moves the mock market, and liquidates the pair. It finishes by auditing all
+collateral and receipts. See [the perpetuals specification](docs/PERPETUALS.md)
+for the formulas, risk parameters, bankruptcy handling, and model limits.
 
 The API listens on `127.0.0.1:8787`. It prints an operator token at startup. The
 default database `static-sim.sqlite` persists between server restarts. You can
@@ -80,10 +87,18 @@ for a clean walkthrough: `python -m static_protocol serve --db walkthrough.sqlit
 | Fees | Foreign 0.050% and native 0.025% schedules; integer rounding; fees accrued as USD_TEST |
 | Ledger | Available and locked balances; simulated funding/withdrawals; per-asset conservation checks |
 | Receipts | Durable batch records; idempotent sweep requests; linked SHA-256 hashes; integrity checks |
+| Perpetuals | Persistent matched long/short pairs, isolated collateral, unrealized PnL, top-ups, and full-pair close |
+| Perpetual risk | Mock mark/index freshness and divergence checks; initial and maintenance margin; deterministic funding |
+| Liquidation model | Full-pair mark settlement; finite insurance; explicit uncovered-loss haircuts; collateral conservation |
 | Reserve model | Chosen linear curve; integral pricing; two-way redemption; slippage bounds; per-transaction issuance cap |
 | AMM model | Independent constant-product swaps with integer rounding and minimum-output bounds |
 | Treasury model | Simulated-sompi 50/25/25 allocation and linear OpEx release capped at 5% per 30-day epoch |
 | API | Local token-protected JSON endpoints; real HTTP end-to-end tests |
+
+Perpetual collateral has its own persistent ledger, separate from spot balances.
+Positions are paired explicitly by the local operator. Liquidation settles the
+whole pair at a mock mark; there is no order-book execution, partial reduction,
+real oracle, or automatic keeper. No real trading venue is deployed.
 
 The curve, AMM, and treasury are **independent in-memory economic models**. They
 are not connected to the persistent order ledger or exposed as API operations.
@@ -137,6 +152,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the initial implementation and
 - [Architecture and accounting](docs/ARCHITECTURE.md)
 - [Whitepaper gaps and implementation decisions](docs/SPEC_REVIEW.md)
 - [API contract](docs/API.md)
+- [Perpetuals model and risk rules](docs/PERPETUALS.md)
 - [Current status and next implementation gates](docs/STATUS.md)
 - [Threat model](SECURITY.md)
 - [Pinned source observations](docs/SOURCES.md)

@@ -22,6 +22,13 @@ model; simulation behavior is not consensus or custody enforcement.
 - BUILD.json lists SHA-256 content hashes. Refresh it after changing tracked
   project files, excluding BUILD.json itself and Git/cache/runtime files.
 
-The next engineering milestone is the intake-covenant validation described in
-docs/STATUS.md. Do not present derivatives, foreign collateral, graduation,
-non-custody, throughput targets, or MEV immunity as completed features.
+Read docs/PERPETUALS.md before editing the paired perpetual simulator. Its
+collateral ledger is separate from spot and its close/liquidation path settles
+both counterparties at a mock mark. Preserve funding neutrality, finite
+insurance, explicit loss haircuts and state commitments. Never hide bad debt
+by minting a cash balance or silently taking unrelated isolated collateral.
+
+The next perpetuals milestone is matching and partial reductions; intake-covenant
+validation remains a separate chain milestone in docs/STATUS.md. Do not present
+live derivatives, foreign collateral, graduation, non-custody, throughput targets,
+or MEV immunity as completed features.

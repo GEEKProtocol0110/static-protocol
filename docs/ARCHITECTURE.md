@@ -1,5 +1,10 @@
 # Architecture and accounting
 
+Version 0.2.0 adds a separate persistent paired perpetuals ledger. Its risk,
+funding, liquidation and state-commitment rules are specified in
+[PERPETUALS.md](PERPETUALS.md). The spot architecture below remains unchanged;
+the two ledgers do not share collateral or transfer balances.
+
 ## Boundaries
 
 The executable reference has a pure auction function, a transactional local

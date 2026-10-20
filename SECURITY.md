@@ -1,6 +1,6 @@
 # Security boundary
 
-STATIC v0.1.0 is a local simulator. Use fictional balances only. Its checks
+STATIC v0.2.0 is a local simulator. Use fictional balances only. Its checks
 are useful for verifying candidate economics and state transitions, not for
 custody or public exchange operation.
 
@@ -40,9 +40,22 @@ receipt chains are detected. Same-name opposite-side open orders are blocked.
 Batch inclusion/exclusion, batch timing, cancellation timing, multiple owner
 labels, nonce grinding, liquidity concentration and strategic limit placement
 are not solved by uniform pricing. Native fee eligibility is not verified.
-There are no cryptographic owner signatures. There is no bridge, oracle,
-stablecoin issuer verification, leverage, liquidation system, gas-rail
-conversion, distributed shared-state enforcement or consensus script.
+There are no cryptographic owner signatures. There is no bridge, authenticated
+oracle, stablecoin issuer verification, live leveraged trading, gas conversion,
+distributed shared-state enforcement or consensus script.
+
+The paired perpetuals simulator supports isolated margin, funding and modeled
+liquidation. Its operator controls identities, matched counterparties, time,
+prices and rates. Mark/index bounds cannot authenticate a jointly forged feed.
+Both counterparties close at a mock mark without execution or slippage proof.
+Funding has no premium estimator or scheduler. Its finite insurance can run
+out; receipts explicitly record payout haircuts. Unrelated isolated cash is
+not seized to hide those losses. See docs/PERPETUALS.md for the exact rules.
+
+Perpetual receipts also commit to current state, catching uncoordinated
+value-conserving edits such as a changed funding accumulator. An administrator
+can still rewrite the entire database and recompute all hashes or truncate
+history. No external solvency proof or custody enforcement is established.
 
 The loopback API is intended for trusted local use. It is not hardened against
 malicious local users or unbounded request concurrency. Full-state reads and

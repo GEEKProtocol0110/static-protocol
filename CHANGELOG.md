@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.0 — Paired perpetuals simulator
+
+### Added
+
+- Persistent matched long/short pairs with isolated quote collateral, entry and
+  exit fees, initial/maintenance margin, unrealized PnL and margin top-ups.
+- Mock index/mark observations with freshness, divergence and time bounds.
+- Sequential funding events with symmetric rounding and no protocol revenue.
+- Full-pair close and liquidation accounting, finite insurance coverage, and
+  explicitly disclosed uncovered-loss haircuts.
+- Idempotent mutations, receipt chains and complete perpetual state commitments.
+- Local perpetual HTTP routes, CLI demo/audit, and a documented risk model.
+- 41 additional tests (89 total), including the full HTTP funding/liquidation
+  flow, concurrent retries, restart, tampering and price-gap shortfalls.
+
+### Scope
+
+Pairs are supplied by the operator and settle at mock marks. Limit-price
+matching, partial reductions, real oracle authentication, executable liquidation
+and live settlement remain future work. Spot collateral stays separate.
+
 ## 0.1.0 — Reference implementation
 
 ### Added
