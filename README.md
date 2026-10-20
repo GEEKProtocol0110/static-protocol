@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml"><img alt="Reference engine checks" src="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml"><img alt="Reference engine checks" src="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml/badge.svg?branch=main&amp;event=push"></a>
   <img alt="Python 3.11 and later" src="https://img.shields.io/badge/Python-3.11%2B-3776ab">
   <img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-25b7aa">
   <img alt="Simulation only" src="https://img.shields.io/badge/stage-simulation-d4a64a">
