@@ -78,9 +78,13 @@ def make_server(engine, token, port=8787):
                           "/v1/perps/insurance": (perps.fund_insurance, {"request_id", "amount", "now"}),
                           "/v1/perps/oracle": (perps.publish_oracle, {"request_id", "index_price", "mark_price", "observed_at", "now"}),
                           "/v1/perps/open": (perps.open_pair, {"request_id", "long_owner", "short_owner", "quantity", "long_margin", "short_margin", "now", "long_rail", "short_rail"}),
+                          "/v1/perps/orders": (perps.place_order, {"request_id", "owner", "nonce", "side", "quantity", "limit_price", "margin_per_lot", "expires_at", "now", "fee_rail"}),
+                          "/v1/perps/orders/cancel": (perps.cancel_order, {"request_id", "order_id", "owner", "now"}),
+                          "/v1/perps/match": (perps.match_orders, {"request_id", "now", "max_inputs"}),
                           "/v1/perps/top-up": (perps.top_up, {"request_id", "pair_id", "owner", "amount", "now"}),
                           "/v1/perps/funding": (perps.settle_funding, {"request_id", "epoch", "rate_bps", "now"}),
                           "/v1/perps/close": (perps.close_pair, {"request_id", "pair_id", "owner", "now"}),
+                          "/v1/perps/reduce": (perps.reduce_pair, {"request_id", "pair_id", "owner", "quantity", "now"}),
                           "/v1/perps/liquidate": (perps.liquidate, {"request_id", "pair_id", "now"}),
                           "/v1/perps/risk": (perps.risk, {"pair_id", "now"})}
                 path = urlsplit(self.path).path

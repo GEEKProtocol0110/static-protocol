@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml"><img alt="Reference engine checks" src="https://github.com/GEEKProtocol0110/static-protocol/actions/workflows/test.yml/badge.svg?branch=main&amp;event=push"></a>
   <img alt="Python 3.11 and later" src="https://img.shields.io/badge/Python-3.11%2B-3776ab">
-  <img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-25b7aa">
+  <img alt="Version 0.3.0" src="https://img.shields.io/badge/version-0.3.0-25b7aa">
   <img alt="Simulation only" src="https://img.shields.io/badge/stage-simulation-d4a64a">
 </p>
 
@@ -21,14 +21,15 @@
 **An executable foundation for perpetuals and settlement research on Kaspa.**
 
 STATIC models the order-intake, batch-settlement, reserve, and treasury ideas in
-the supplied *STATIC Protocol Technical Whitepaper v1.0*. Version 0.2 adds a
-persistent, paired perpetuals simulator with isolated collateral, funding,
-and liquidation accounting. It does not accept funds, issue tokens,
+the supplied *STATIC Protocol Technical Whitepaper v1.0*. Version 0.3 adds
+collateralized perpetual limit orders, matching at a mock mark, and partial
+position reductions to the persistent margin and funding simulator.
+It does not accept funds, issue tokens,
 create wallets, or broadcast Kaspa transactions.
 
 | Today | Next milestone |
 | --- | --- |
-| Spot foundation and paired perpetuals simulator; 89 passing tests; persistent accounting and a local operator API | Perpetual order matching and partial reductions; separately, a compiled intake covenant |
+| Spot and perpetuals simulators; 126 passing tests; reserved limit orders, partial reductions, persistent accounting and a local operator API | Authenticated prices/rates and executable liquidation; separately, a compiled intake covenant |
 
 The project is in the **reference implementation** stage. The economic models
 and protocol integration gates are documented so contributors can distinguish
@@ -43,6 +44,7 @@ git clone https://github.com/GEEKProtocol0110/static-protocol.git
 cd static-protocol
 python -m static_protocol demo
 python -m static_protocol perps-demo
+python -m static_protocol orders-demo
 python -m unittest discover -s tests -v
 ```
 
@@ -61,6 +63,11 @@ The perpetuals demo opens a matched long and short, accrues funding, adds margin
 moves the mock market, and liquidates the pair. It finishes by auditing all
 collateral and receipts. See [the perpetuals specification](docs/PERPETUALS.md)
 for the formulas, risk parameters, bankruptcy handling, and model limits.
+
+The orders demo matches separately funded long and short intents, accrues
+funding, reduces a position, and closes the remainder. See
+[orders and reductions](docs/ORDERS-AND-REDUCTIONS.md) for reservations, matching
+priority, rounding, and automatic v0.2 database migration.
 
 The API listens on `127.0.0.1:8787`. It prints an operator token at startup. The
 default database `static-sim.sqlite` persists between server restarts. You can
@@ -87,7 +94,8 @@ for a clean walkthrough: `python -m static_protocol serve --db walkthrough.sqlit
 | Fees | Foreign 0.050% and native 0.025% schedules; integer rounding; fees accrued as USD_TEST |
 | Ledger | Available and locked balances; simulated funding/withdrawals; per-asset conservation checks |
 | Receipts | Durable batch records; idempotent sweep requests; linked SHA-256 hashes; integrity checks |
-| Perpetuals | Persistent matched long/short pairs, isolated collateral, unrealized PnL, top-ups, and full-pair close |
+| Perpetual orders | Reserved collateral, immutable nonce-bound intents, expiry/cancellation, rotating admission and limit-protected mock-mark matching |
+| Perpetuals | Persistent long/short pairs, isolated collateral, unrealized PnL, top-ups, partial reductions and full-pair close |
 | Perpetual risk | Mock mark/index freshness and divergence checks; initial and maintenance margin; deterministic funding |
 | Liquidation model | Full-pair mark settlement; finite insurance; explicit uncovered-loss haircuts; collateral conservation |
 | Reserve model | Chosen linear curve; integral pricing; two-way redemption; slippage bounds; per-transaction issuance cap |
@@ -96,9 +104,10 @@ for a clean walkthrough: `python -m static_protocol serve --db walkthrough.sqlit
 | API | Local token-protected JSON endpoints; real HTTP end-to-end tests |
 
 Perpetual collateral has its own persistent ledger, separate from spot balances.
-Positions are paired explicitly by the local operator. Liquidation settles the
-whole pair at a mock mark; there is no order-book execution, partial reduction,
-real oracle, or automatic keeper. No real trading venue is deployed.
+Positions open from eligible limit orders or the direct research API. Each
+reduction shrinks both counterparties together; liquidation settles the whole
+pair at a mock mark. Price discovery, executable liquidity, real oracle
+authentication and automatic keepers remain future work.
 
 The curve, AMM, and treasury are **independent in-memory economic models**. They
 are not connected to the persistent order ledger or exposed as API operations.
@@ -153,6 +162,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the initial implementation and
 - [Whitepaper gaps and implementation decisions](docs/SPEC_REVIEW.md)
 - [API contract](docs/API.md)
 - [Perpetuals model and risk rules](docs/PERPETUALS.md)
+- [Perpetual order matching and partial reductions](docs/ORDERS-AND-REDUCTIONS.md)
 - [Current status and next implementation gates](docs/STATUS.md)
 - [Threat model](SECURITY.md)
 - [Pinned source observations](docs/SOURCES.md)

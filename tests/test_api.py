@@ -112,3 +112,44 @@ class APITests(unittest.TestCase):
                      dict(request_id="d", owner="a", amount=1, now=0, extra=1)):
             self.assertEqual(self.request("/v1/perps/accounts/funding", body)[0], 400)
         self.assertEqual(self.request("/v1/perps/risk", dict(pair_id={}, now=0))[0], 400)
+
+    def test_perps_http_limit_matching_funding_and_partial_close(self):
+        def post(route,**body):
+            status,result=self.request("/v1/perps/"+route,body)
+            self.assertEqual(status,200,result)
+            return result
+        for owner in ("a","b"):
+            post("accounts/funding",request_id="fund-"+owner,owner=owner,amount=500000,now=0)
+        post("oracle",request_id="o1",index_price=10000,mark_price=10000,observed_at=0,now=0)
+        for owner,side,price in (("a","long",10100),("b","short",9900)):
+            post("orders",request_id="order-"+owner,owner=owner,nonce="n",side=side,quantity=5,
+                 limit_price=price,margin_per_lot=3000,expires_at=10000,now=0)
+        match=post("match",request_id="match",now=0)
+        self.assertEqual(match["result"]["matched_quantity"],5)
+        self.assertEqual(match,post("match",request_id="match",now=0))
+        pair=match["result"]["matches"][0]["pair_id"]
+        post("oracle",request_id="o2",index_price=10051,mark_price=10000,observed_at=3600,now=3600)
+        post("funding",request_id="f",epoch=1,rate_bps=100,now=3600)
+        post("oracle",request_id="o3",index_price=10500,mark_price=10500,observed_at=3601,now=3601)
+        reduced=post("reduce",request_id="reduce",pair_id=pair,owner="a",quantity=2,now=3601)
+        self.assertEqual(reduced["result"]["remaining_quantity"],3)
+        self.assertEqual(reduced["result"]["funding_long_paid"],200)
+        self.assertEqual(reduced["result"]["long_realized_pnl"],1000)
+        self.assertEqual(reduced,post("reduce",request_id="reduce",pair_id=pair,owner="a",quantity=2,now=3601))
+        post("close",request_id="close",pair_id=pair,owner="b",now=3601)
+        _,audit=self.request("/v1/perps/audit")
+        self.assertEqual(audit["conservation"],"passed")
+        self.assertEqual(audit["held_collateral"],1000000)
+
+    def test_perps_http_cancel_order_and_reject_unauthorized_orders(self):
+        self.assertEqual(self.request("/v1/perps/orders",{},auth=False)[0],401)
+        self.request("/v1/perps/accounts/funding",dict(request_id="f",owner="a",amount=50000,now=0))
+        status,placed=self.request("/v1/perps/orders",dict(request_id="o",owner="a",nonce="n",side="long",
+                                           quantity=1,limit_price=10000,margin_per_lot=3000,expires_at=1000,now=0))
+        self.assertEqual(status,200)
+        oid=placed["result"]["id"]
+        self.assertEqual(self.request("/v1/perps/orders/cancel",dict(request_id="bad",order_id=oid,owner="wrong",now=0))[0],400)
+        status,result=self.request("/v1/perps/orders/cancel",dict(request_id="cancel",order_id=oid,owner="a",now=100))
+        self.assertEqual(status,200)
+        self.assertEqual(result["result"]["status"],"cancelled")
+        self.assertEqual(self.request("/v1/perps/state")[1]["accounts"][0]["cash"],50000)
