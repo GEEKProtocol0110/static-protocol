@@ -28,7 +28,9 @@ implement the reference engine.
 
 1. Choose spot-only launch versus derivatives. Perpetuals require positions,
    margin, funding, oracle freshness, liquidation, bankruptcies, and loss
-   socialization rules; none is implemented here.
+   socialization rules. Version 0.2.0 adds a paired isolated-margin simulator,
+   mock snapshots, funding and explicit insurance/haircut accounting; real
+   matching, executable liquidation and production derivatives remain pending.
 2. Define the asset representation and its relationship to covenant IDs,
    asset lineage, KCC20 or another token system. A string is not an asset proof.
 3. Define which signatures authorize which intent, including chain/domain

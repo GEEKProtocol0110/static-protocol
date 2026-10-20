@@ -69,3 +69,46 @@ class APITests(unittest.TestCase):
         from static_protocol.types import ProtocolError
         with self.assertRaises(ProtocolError):
             make_server(None, "short", 0)
+
+    def test_perps_http_funding_and_gap_liquidation(self):
+        def post(route, **body):
+            status, result = self.request("/v1/perps/" + route, body)
+            self.assertEqual(status, 200, result)
+            return result
+        for owner in ("long", "short"):
+            post("accounts/funding", request_id="deposit-"+owner, owner=owner, amount=500000, now=0)
+        post("insurance", request_id="insurance", amount=10000, now=0)
+        post("oracle", request_id="o1", index_price=10000, mark_price=10000, observed_at=0, now=0)
+        opened = post("open", request_id="open", long_owner="long", short_owner="short", quantity=10, long_margin=20000, short_margin=20000, now=0)
+        pair = opened["result"]["pair_id"]
+        self.assertFalse(post("risk", pair_id=pair, now=0)["short_liquidatable"])
+        post("oracle", request_id="o2", index_price=10000, mark_price=10000, observed_at=3600, now=3600)
+        funding = post("funding", request_id="f1", epoch=1, rate_bps=10, now=3600)
+        self.assertEqual(funding["result"]["payments"][0]["long_paid"], 100)
+        post("oracle", request_id="o3", index_price=15000, mark_price=15000, observed_at=3601, now=3601)
+        result = post("liquidate", request_id="liq", pair_id=pair, now=3601)
+        self.assertEqual(result["result"]["insurance_used"], 10000)
+        self.assertEqual(result["result"]["uncovered_loss"], 19900)
+        self.assertEqual(result, post("liquidate", request_id="liq", pair_id=pair, now=3601))
+        status, audit = self.request("/v1/perps/audit")
+        self.assertEqual(status, 200)
+        self.assertEqual(audit["conservation"], "passed")
+        self.assertEqual(audit["state_commitment"], "passed")
+        self.assertEqual(audit["held_collateral"], 1010000)
+
+    def test_perps_http_rejects_stale_oracle_without_mutation(self):
+        self.request("/v1/perps/oracle", dict(request_id="o", index_price=10000, mark_price=10000, observed_at=0, now=0))
+        before = self.request("/v1/perps/state")[1]
+        status, _ = self.request("/v1/perps/open", dict(request_id="open", long_owner="a", short_owner="b", quantity=10, long_margin=20000, short_margin=20000, now=61))
+        self.assertEqual(status, 400)
+        self.assertEqual(before, self.request("/v1/perps/state")[1])
+
+    def test_perps_http_requires_operator_token(self):
+        self.assertEqual(self.request("/v1/perps/state", auth=False)[0], 401)
+        self.assertEqual(self.request("/v1/perps/accounts/funding", dict(request_id="d", owner="a", amount=1, now=0), auth=False)[0], 401)
+
+    def test_perps_http_rejects_invalid_wire_values(self):
+        for body in (dict(request_id="d", owner="a", amount=True, now=0),
+                     dict(request_id="d", owner="a", amount=1, now=0, extra=1)):
+            self.assertEqual(self.request("/v1/perps/accounts/funding", body)[0], 400)
+        self.assertEqual(self.request("/v1/perps/risk", dict(pair_id={}, now=0))[0], 400)

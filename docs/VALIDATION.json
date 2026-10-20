@@ -1,44 +1,52 @@
 {
-  "version": "0.1.0",
-  "validated_at_utc": "2026-10-20T02:37:29.585515+00:00",
+  "version": "0.2.0",
+  "validated_at_utc": "2026-10-20T03:51:44.938861+00:00",
   "runtime": "3.12.14",
   "suite": {
     "command": "python3 -m unittest discover -s tests -v",
-    "passed": 48,
+    "passed": 89,
     "failures": 0,
     "errors": 0,
-    "elapsed_seconds": 3.801
+    "elapsed_seconds": 7.122
   },
   "coverage_scenarios": [
-    "complete HTTP settlement",
-    "authentication rejection",
-    "random books (300)",
-    "random ledger sequence (160 intents)",
-    "random reserve operations (1000)",
-    "concurrent intake",
-    "concurrent sweep idempotence",
-    "transaction rollback with injected failure",
-    "database restart",
-    "balance and receipt tampering",
-    "partial-fill rounding",
-    "queue rotation",
-    "self-trade guard",
-    "curve redemption and slippage",
-    "AMM product",
-    "treasury allocation, drip and disabled override"
+    "prior spot/reserve/treasury suite",
+    "persistent paired perpetuals",
+    "initial and maintenance margin",
+    "long/short PnL",
+    "top-ups and isolated cash",
+    "mock oracle freshness, divergence and monotonic time",
+    "positive and negative funding, timing, caps and neutral rounding",
+    "full-pair liquidation",
+    "finite insurance and explicit loss haircut",
+    "funding, position and receipt tampering",
+    "concurrent open/close and retry",
+    "restart recovery",
+    "injected settlement rollback",
+    "full HTTP funding and gap-liquidation flow",
+    "60 seeded random open/price/close cycles"
   ],
-  "demo": {
-    "executed_volume": 10,
-    "price": 100,
-    "receipt_hash": "85e805372a2a545efcf0deaa29cdfdb0fc0244ec5e56dd56675cf8c8bbd4ce15",
-    "conservation": "passed"
+  "demos": {
+    "spot": {
+      "executed_volume": 10,
+      "conservation": "passed"
+    },
+    "perpetuals": {
+      "funding_long_paid": 100,
+      "liquidation_status": "liquidated",
+      "collateral": 1050000,
+      "conservation": "passed",
+      "state_commitment": "passed"
+    }
   },
   "not_validated": [
-    "SilverScript compilation",
-    "Kaspa node script execution",
-    "testnet or mainnet transactions",
+    "live perpetual matching or order execution",
+    "partial close/reduction",
+    "authenticated price or funding-rate input",
+    "scheduler or automatic liquidation keeper",
+    "SilverScript or node validation",
+    "testnet/mainnet transfer",
     "throughput or latency",
-    "real token or collateral integration",
-    "external audit or formal security proof"
+    "external audit or formal verification"
   ]
 }

@@ -1,12 +1,16 @@
-STATIC v0.1.0 validation
+STATIC v0.2.0 validation
 
 Python 3.12.14
 Command: python3 -m unittest discover -s tests -v
-Result: 48 tests passed; 0 failures; 0 errors; 3.801 seconds.
+Result: 89 tests passed; 0 failures; 0 errors; 7.122 seconds.
 
-The local HTTP flow, concurrent retries, injected failure rollback, restart recovery,
-conservation checks, tampering detection, and independent economic models passed.
+Includes the prior 48 spot/reserve/treasury checks and 41 additional perpetual
+and HTTP checks: paired positions, margin, PnL, signed-direction funding,
+liquidation, insurance gaps, explicit loss haircuts, retries, concurrency,
+restart recovery, fault rollback, and receipt/state tampering.
 
-No covenant compiler, node validation, testnet/mainnet transfer, real funds,
-throughput benchmark, external audit, or formal proof was exercised.
-See VALIDATION.json for scope and examples/demo-output.json for a worked receipt.
+Both CLI demos executed successfully. The perpetual demo conserves all
+1,050,000 fictional quote atoms and verifies its current state commitment.
+
+No real funds, live matching, authenticated oracle, automatic keeper,
+covenant compiler, node validation, external audit or formal proof was exercised.
