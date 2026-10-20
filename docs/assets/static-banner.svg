@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="380" viewBox="0 0 1280 380" role="img" aria-labelledby="title desc">
+  <title id="title">STATIC Protocol</title>
+  <desc id="desc">Settlement research for Kaspa. Batch auctions, continuous reserves, treasury rules. Version 0.1.0 reference engine, simulated assets.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#081725"/><stop offset="1" stop-color="#102a37"/></linearGradient>
+    <linearGradient id="accent"><stop stop-color="#6ff3d3"/><stop offset="1" stop-color="#44a7d5"/></linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#9dece2" stroke-opacity=".045"/></pattern>
+  </defs>
+  <rect width="1280" height="380" rx="18" fill="url(#bg)"/>
+  <rect width="1280" height="380" rx="18" fill="url(#grid)"/>
+  <path d="M0 377H1280" stroke="url(#accent)" stroke-width="6"/>
+  <g transform="translate(70 66)" fill="none" stroke="url(#accent)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 0H63L33 38H0L-30 76H33"/>
+    <path d="M86 0L26 76" stroke-opacity=".38"/>
+  </g>
+  <text x="188" y="107" font-family="DejaVu Sans,Arial,sans-serif" font-size="59" font-weight="700" letter-spacing="10" fill="#f1fafb">STATIC</text>
+  <text x="192" y="144" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" letter-spacing="7" fill="#8fc8cc">PROTOCOL</text>
+  <text x="68" y="208" font-family="DejaVu Sans,Arial,sans-serif" font-size="29" font-weight="500" fill="#e5f4f5">Settlement research for Kaspa.</text>
+  <text x="69" y="248" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" fill="#a0bdc8">Batch auctions. Continuous reserves. Treasury rules.</text>
+  <rect x="68" y="293" width="452" height="35" rx="6" fill="#153a44" stroke="#28545e"/>
+  <circle cx="87" cy="310" r="4" fill="#6ff3d3"/>
+  <text x="102" y="316" font-family="DejaVu Sans Mono,monospace" font-size="12" letter-spacing="1" fill="#bfe9e2">v0.1.0 / REFERENCE ENGINE / SIMULATED ASSETS</text>
+  <g fill="none" stroke="#63dbca" stroke-width="2">
+    <path d="M864 70H927L967 111H1122M864 140H927L967 111M864 210H927L967 249H1122M864 280H927L967 249" opacity=".32"/>
+    <path d="M1002 111V249" opacity=".32"/>
+    <rect x="1048" y="160" width="74" height="38" rx="8" fill="#133540" stroke-opacity=".55"/>
+    <circle cx="847" cy="70" r="12" fill="#0e2734"/><circle cx="847" cy="140" r="12" fill="#0e2734"/>
+    <circle cx="847" cy="210" r="12" fill="#0e2734"/><circle cx="847" cy="280" r="12" fill="#0e2734"/>
+    <path d="M1002 179H1048" opacity=".7"/>
+    <circle cx="1002" cy="111" r="5" fill="#6ff3d3"/><circle cx="1002" cy="249" r="5" fill="#6ff3d3"/>
+    <path d="M1122 111H1167V249H1122" opacity=".32"/>
+  </g>
+  <text x="1066" y="184" font-family="DejaVu Sans Mono,monospace" font-size="13" fill="#a7e7df">CORE</text>
+  <text x="832" y="330" font-family="DejaVu Sans Mono,monospace" font-size="11" letter-spacing="2" fill="#729aa9">DETERMINISTIC BY DESIGN</text>
+</svg>

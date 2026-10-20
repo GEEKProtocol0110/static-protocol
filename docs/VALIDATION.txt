@@ -1,0 +1,12 @@
+STATIC v0.1.0 validation
+
+Python 3.12.14
+Command: python3 -m unittest discover -s tests -v
+Result: 48 tests passed; 0 failures; 0 errors; 3.801 seconds.
+
+The local HTTP flow, concurrent retries, injected failure rollback, restart recovery,
+conservation checks, tampering detection, and independent economic models passed.
+
+No covenant compiler, node validation, testnet/mainnet transfer, real funds,
+throughput benchmark, external audit, or formal proof was exercised.
+See VALIDATION.json for scope and examples/demo-output.json for a worked receipt.

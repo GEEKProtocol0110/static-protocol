@@ -1,0 +1,175 @@
+{
+  "version": "0.1.0",
+  "mode": "simulation",
+  "receipt": {
+    "version": 1,
+    "mode": "simulation",
+    "market": "STATIC_TEST/USD_TEST",
+    "sequence": 1,
+    "request_id": "batch-1",
+    "request_hash": "67aaa22920fe3a429c3ad87b2d1522e60ae5665688db8049e7244c433e167119",
+    "daa": 1,
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "input_ids": [
+      "d73b7f031f4f385bade4b0a6efae41b410f93329e13daa0c68174fa41436dc3d",
+      "07a3552b915ae504225e8c1ef670c2679d6795dc28b0a71e6ef1242214420615"
+    ],
+    "expired_ids": [],
+    "clearing_price": 100,
+    "executed_volume": 10,
+    "quote_fees": 2,
+    "fills": [
+      {
+        "order_id": "d73b7f031f4f385bade4b0a6efae41b410f93329e13daa0c68174fa41436dc3d",
+        "owner": "alice",
+        "side": "buy",
+        "quantity": 10,
+        "price": 100,
+        "fee": 1
+      },
+      {
+        "order_id": "07a3552b915ae504225e8c1ef670c2679d6795dc28b0a71e6ef1242214420615",
+        "owner": "bob",
+        "side": "sell",
+        "quantity": 10,
+        "price": 100,
+        "fee": 1
+      }
+    ],
+    "hash": "85e805372a2a545efcf0deaa29cdfdb0fc0244ec5e56dd56675cf8c8bbd4ce15"
+  },
+  "audit": {
+    "mode": "simulation",
+    "conservation": "passed",
+    "lock_accounting": "passed",
+    "receipt_chain": "passed",
+    "receipts": 1,
+    "head": "85e805372a2a545efcf0deaa29cdfdb0fc0244ec5e56dd56675cf8c8bbd4ce15",
+    "chain_anchor": false,
+    "cryptographic_ownership": false
+  },
+  "state": {
+    "mode": "simulation",
+    "market": "STATIC_TEST/USD_TEST",
+    "daa": 1,
+    "balances": [
+      {
+        "owner": "alice",
+        "asset": "STATIC_TEST",
+        "available": 10,
+        "locked": 0
+      },
+      {
+        "owner": "alice",
+        "asset": "USD_TEST",
+        "available": 998999,
+        "locked": 0
+      },
+      {
+        "owner": "bob",
+        "asset": "STATIC_TEST",
+        "available": 90,
+        "locked": 0
+      },
+      {
+        "owner": "bob",
+        "asset": "USD_TEST",
+        "available": 999,
+        "locked": 0
+      }
+    ],
+    "orders": [
+      {
+        "seq": 1,
+        "id": "d73b7f031f4f385bade4b0a6efae41b410f93329e13daa0c68174fa41436dc3d",
+        "owner": "alice",
+        "nonce": "buy-1",
+        "side": "buy",
+        "quantity": 10,
+        "remaining": 0,
+        "limit_price": 110,
+        "expiry_daa": 100,
+        "fee_rail": "native",
+        "reserved": 0,
+        "status": "filled"
+      },
+      {
+        "seq": 2,
+        "id": "07a3552b915ae504225e8c1ef670c2679d6795dc28b0a71e6ef1242214420615",
+        "owner": "bob",
+        "nonce": "sell-1",
+        "side": "sell",
+        "quantity": 10,
+        "remaining": 0,
+        "limit_price": 100,
+        "expiry_daa": 100,
+        "fee_rail": "foreign",
+        "reserved": 0,
+        "status": "filled"
+      }
+    ],
+    "protocol_fees": [
+      {
+        "asset": "USD_TEST",
+        "amount": 2
+      }
+    ],
+    "receipts": [
+      {
+        "clearing_price": 100,
+        "daa": 1,
+        "executed_volume": 10,
+        "expired_ids": [],
+        "fills": [
+          {
+            "fee": 1,
+            "order_id": "d73b7f031f4f385bade4b0a6efae41b410f93329e13daa0c68174fa41436dc3d",
+            "owner": "alice",
+            "price": 100,
+            "quantity": 10,
+            "side": "buy"
+          },
+          {
+            "fee": 1,
+            "order_id": "07a3552b915ae504225e8c1ef670c2679d6795dc28b0a71e6ef1242214420615",
+            "owner": "bob",
+            "price": 100,
+            "quantity": 10,
+            "side": "sell"
+          }
+        ],
+        "input_ids": [
+          "d73b7f031f4f385bade4b0a6efae41b410f93329e13daa0c68174fa41436dc3d",
+          "07a3552b915ae504225e8c1ef670c2679d6795dc28b0a71e6ef1242214420615"
+        ],
+        "market": "STATIC_TEST/USD_TEST",
+        "mode": "simulation",
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "quote_fees": 2,
+        "request_hash": "67aaa22920fe3a429c3ad87b2d1522e60ae5665688db8049e7244c433e167119",
+        "request_id": "batch-1",
+        "sequence": 1,
+        "version": 1,
+        "hash": "85e805372a2a545efcf0deaa29cdfdb0fc0244ec5e56dd56675cf8c8bbd4ce15"
+      }
+    ]
+  },
+  "independent_models": {
+    "curve": {
+      "paid": 1050,
+      "refunded": 1050,
+      "supply": 0,
+      "reserve": 0
+    },
+    "amm_quote_out": 990,
+    "treasury_simulated_sompi": {
+      "split": {
+        "sovereign": 500000,
+        "backstop": 250000,
+        "opex": 250000
+      },
+      "opex_released": 12500
+    }
+  },
+  "live_broadcast": false
+}

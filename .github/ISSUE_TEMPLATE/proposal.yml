@@ -1,0 +1,30 @@
+name: Protocol or implementation proposal
+description: Propose a focused improvement with an explicit validation path.
+title: "[Proposal] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What concrete limitation or use case does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed behavior
+      description: Explain units, invariants, rounding, state transitions, or dependencies that change.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation and assumptions
+      description: What test, counterexample, compiled artifact, or node result would demonstrate success?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and tradeoffs
+      description: Identify trust assumptions and work intentionally left for a later milestone.

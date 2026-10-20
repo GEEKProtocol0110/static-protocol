@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a reproducible issue in the reference implementation.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use fictional assets and redact secrets. Report security-sensitive issues privately; see SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: Version and environment
+      placeholder: "v0.1.0, Python 3.12, operating system"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps or minimal reproduction
+      description: Include the smallest order sequence or command that demonstrates the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+      description: Identify the accounting or state-transition invariant if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation output
+      description: Include relevant test output or simulated receipts, without tokens or private data.
