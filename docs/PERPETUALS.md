@@ -1,17 +1,21 @@
 # Paired perpetuals reference model
 
-Version 0.2.0 implements one fictional linear contract,
+Version 0.3.0 implements one fictional linear contract,
 `STATIC_TEST-PERP/USD_TEST`. Each lot represents one fictional base unit;
 prices and collateral use integer quote atoms. No real USD value, token
 redemption, non-custody, or chain execution is implied.
 
 ## What works
 
-The operator explicitly pairs one long with one short of equal quantity.
+Eligible limit orders match one long with one short of equal quantity;
+the operator can also create pairs through the direct research API.
 Both post isolated collateral from their perpetual cash balances, and pay
-entry fees separately. Each pair can be topped up, monitored, fully closed,
+entry fees separately. Each pair can be topped up, monitored, partially reduced, fully closed,
 or fully liquidated. Both counterparties settle together. Spot balances,
 reserve objects, and the treasury remain separate from perpetual collateral.
+
+See [ORDERS-AND-REDUCTIONS.md](ORDERS-AND-REDUCTIONS.md) for order reservations,
+matching, exact partial-close allocation and migration from v0.2 databases.
 
 The module reuses SQLite transactions, with separate `perp_*` tables. Every
 successful mutation produces a durable, retry-safe receipt and state
@@ -45,9 +49,9 @@ result, including after subsequent state changes.
 
 This is an unauthenticated mock feed. Both index and mark are controlled by the
 operator, so the band check cannot prevent manipulation. Entry and settlement
-use the latest accepted mark inside the transaction. Signed quotes, user price
-limits, external aggregation, premium estimation and executable fills remain
-future requirements.
+use the latest accepted mark inside the transaction. Limit orders enforce user
+price bounds at that mark. Signed quotes, external aggregation, price discovery,
+premium estimation and executable fills remain future requirements.
 
 ## Equity and margin
 
@@ -65,7 +69,8 @@ maintenance for each side = ceil(q * p * maintenance_bps / 10000)
 Both sides must post `ceil(q * e * initial_margin_bps / 10000)` or more.
 Entry fees are additional. Top-ups move free cash into that side's escrow and
 remain possible during oracle staleness. Removing margin and withdrawing
-unrealized profit are not implemented. Free cash withdrawals cannot take escrow.
+unrealized profit are not implemented. Free cash withdrawals cannot take escrow
+or open-order reservations. Partial reductions realize PnL on the closed slice.
 
 Mark changes affect unrealized equity, not actual collateral. The pair's equity
 sum equals posted escrow. Negative equity is recognized as a deficit rather
@@ -99,8 +104,9 @@ and downtime-recovery policy are still required before serving traders.
 
 Either labeled counterparty can request full pair close. The local operator
 can liquidate only if one side is strictly below maintenance. There are no
-owner signatures, liquidation bounties, penalties, partial closes or partial
-liquidations. Settlement closes the healthy counterparty as well, at a mock
+owner signatures, liquidation bounties, penalties or partial liquidations.
+Voluntary partial reductions must preserve both residual sides' maintenance.
+Settlement closes the healthy counterparty as well, at a mock
 mark. It does not establish executable liquidity or timely keeper behavior.
 
 1. Compute raw equity including cumulative funding.
@@ -127,10 +133,10 @@ After every mutation:
 
 ```
 net simulated deposits (including insurance) - simulated withdrawals
-  = free cash + all open-pair escrow + remaining insurance + protocol fees
+  = free cash + open-order reserves + open-pair escrow + insurance + protocol fees
 ```
 
-Each receipt commits to the ordered perpetual account, pair, funding log,
+Each receipt commits to the ordered perpetual account, order, pair, funding log,
 oracle, risk configuration and metadata tables. Before the next mutation and
 during audit, the latest commitment must match the actual tables. This detects
 value-conserving edits, such as changed accumulated funding, as well as balance
@@ -153,7 +159,6 @@ margin top-up, liquidation and final audit. See [API.md](API.md) for HTTP routes
 
 ## Next work
 
-Connect limit-price intents to position matching, add partial reductions and
-risk-aware fill accounting, define price/rate authentication and scheduling,
-and model executable liquidation slippage. Compiled covenant validation is a
+Define price/rate authentication, funding scheduling, price discovery,
+and executable liquidation slippage. Compiled covenant validation is a
 separate milestone. This simulator enables no live settlement path.

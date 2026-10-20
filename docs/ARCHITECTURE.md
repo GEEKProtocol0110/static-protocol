@@ -1,9 +1,11 @@
 # Architecture and accounting
 
-Version 0.2.0 adds a separate persistent paired perpetuals ledger. Its risk,
+Version 0.3.0 includes a separate persistent paired perpetuals ledger. Its risk,
 funding, liquidation and state-commitment rules are specified in
 [PERPETUALS.md](PERPETUALS.md). The spot architecture below remains unchanged;
-the two ledgers do not share collateral or transfer balances.
+the two ledgers do not share collateral or transfer balances. Reserved perpetual
+orders, mock-mark matching, partial reductions and the schema upgrade are
+specified in [ORDERS-AND-REDUCTIONS.md](ORDERS-AND-REDUCTIONS.md).
 
 ## Boundaries
 

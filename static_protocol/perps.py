@@ -11,6 +11,7 @@ import json
 
 from .engine import Engine
 from .types import MAX_INT, QUOTE, ProtocolError, canonical, digest, fee, identifier, integer
+from .perp_orders import ORDER_SCHEMA, OrderMatchingMixin
 
 PERP_MARKET = "STATIC_TEST-PERP/USD_TEST"
 
@@ -62,7 +63,7 @@ def margin_required(notional, bps):
     return (notional * bps + 9999) // 10000
 
 
-class PerpetualEngine:
+class PerpetualEngine(OrderMatchingMixin):
     def __init__(self, path, config=None):
         self.store = Engine(path)
         self.config = RiskConfig() if config is None else config
@@ -70,19 +71,32 @@ class PerpetualEngine:
             raise ProtocolError("config must be a RiskConfig")
         self.config_hash = digest(asdict(self.config))
         with self.store._db(write=True) as db:
-            for statement in SCHEMA.split(";"):
+            for statement in (SCHEMA + ORDER_SCHEMA).split(";"):
                 if statement.strip():
                     db.execute(statement)
-            defaults = {"schema": 1, "time": 0, "fees": 0, "insurance": 0,
+            defaults = {"schema": 2, "time": 0, "fees": 0, "insurance": 0,
                         "uncovered_loss": 0, "funding_epoch": 0, "funding_at": 0}
             for key, value in defaults.items():
                 db.execute("INSERT OR IGNORE INTO perp_meta VALUES (?,?)", (key, value))
-            if self._meta(db, "schema") != 1:
+            if self._meta(db, "schema") not in (1, 2):
                 raise ProtocolError("unsupported perpetual schema")
             settings = canonical(asdict(self.config))
             db.execute("INSERT OR IGNORE INTO perp_config VALUES (1,?)", (settings,))
             if db.execute("SELECT value FROM perp_config WHERE id=1").fetchone()[0] != settings:
                 raise ProtocolError("stored perpetual risk configuration differs; explicit migration required")
+            if self._meta(db, "schema") == 1:
+                self._verify_state(db)
+                self._assert_invariants(db)
+                _, prior_head = self._receipt_chain(db)
+                self._set_meta(db, "schema", 2)
+                db.execute("INSERT INTO perp_meta VALUES ('orders_cursor',0)")
+                self._assert_invariants(db)
+                now = self._meta(db, "time")
+                self._record(db, "system:schema:2:" + prior_head[:32], "schema_migration",
+                             digest(dict(from_schema=1, to_schema=2, prior_head=prior_head)), now,
+                             dict(from_schema=1, to_schema=2, prior_head=prior_head))
+            else:
+                db.execute("INSERT OR IGNORE INTO perp_meta VALUES ('orders_cursor',0)")
 
     @staticmethod
     def _meta(db, key):
@@ -116,17 +130,20 @@ class PerpetualEngine:
             self._set_meta(db, "time", now)
             result = action(db)
             self._assert_invariants(db)
-            prior = db.execute("SELECT seq,hash FROM perp_receipts ORDER BY seq DESC LIMIT 1").fetchone()
-            body = dict(version=1, mode="simulation", market=PERP_MARKET,
-                        sequence=1 if prior is None else prior["seq"] + 1,
-                        request_id=request_id, request_hash=request_hash, kind=kind, now=now,
-                        config_hash=self.config_hash,
-                        previous_hash="0" * 64 if prior is None else prior["hash"],
-                        state_hash=self._state_commitment(db), result=result)
-            receipt_hash = digest(body)
-            db.execute("INSERT INTO perp_receipts(request_id,request_hash,payload,hash) VALUES (?,?,?,?)",
-                       (request_id, request_hash, canonical(body), receipt_hash))
-            return {**body, "hash": receipt_hash}
+            return self._record(db, request_id, kind, request_hash, now, result)
+
+    def _record(self, db, request_id, kind, request_hash, now, result):
+        prior = db.execute("SELECT seq,hash FROM perp_receipts ORDER BY seq DESC LIMIT 1").fetchone()
+        body = dict(version=1, mode="simulation", market=PERP_MARKET,
+                    sequence=1 if prior is None else prior["seq"] + 1,
+                    request_id=request_id, request_hash=request_hash, kind=kind, now=now,
+                    schema=self._meta(db, "schema"), config_hash=self.config_hash,
+                    previous_hash="0" * 64 if prior is None else prior["hash"],
+                    state_hash=self._state_commitment(db), result=result)
+        receipt_hash = digest(body)
+        db.execute("INSERT INTO perp_receipts(request_id,request_hash,payload,hash) VALUES (?,?,?,?)",
+                   (request_id, request_hash, canonical(body), receipt_hash))
+        return {**body, "hash": receipt_hash}
 
     def fund_account(self, request_id, owner, amount, now, direction="in"):
         identifier(owner, "owner")
@@ -187,6 +204,16 @@ class PerpetualEngine:
             raise ProtocolError("open perpetual pair not found")
         return pair
 
+    @staticmethod
+    def _insert_pair(db, pair_id, long_owner, short_owner, quantity, entry_price,
+                     long_margin, short_margin, long_rail, short_rail, now):
+        integer(long_margin + short_margin, "pair collateral", 1)
+        db.execute("""INSERT INTO perp_pairs(id,long_owner,short_owner,quantity,entry_price,
+            long_margin,short_margin,funding_long,long_rail,short_rail,opened_at,status)
+            VALUES (?,?,?,?,?,?,?,0,?,?,?,'open')""",
+            (pair_id, long_owner, short_owner, quantity, entry_price, long_margin,
+             short_margin, long_rail, short_rail, now))
+
     def open_pair(self, request_id, long_owner, short_owner, quantity, long_margin, short_margin,
                   now, long_rail="foreign", short_rail="foreign"):
         identifier(long_owner, "long_owner")
@@ -213,10 +240,8 @@ class PerpetualEngine:
             self._cash(db, short_owner, -short_margin - fees["short"])
             self._set_meta(db, "fees", self._meta(db, "fees") + sum(fees.values()))
             pair_id = digest(dict(domain="STATIC-SIM-PERP-PAIR-v1", request_id=request_id, **params))
-            db.execute("""INSERT INTO perp_pairs(id,long_owner,short_owner,quantity,entry_price,
-                long_margin,short_margin,funding_long,long_rail,short_rail,opened_at,status)
-                VALUES (?,?,?,?,?,?,?,0,?,?,?,'open')""",
-                (pair_id, long_owner, short_owner, quantity, oracle["mark_price"], long_margin, short_margin, long_rail, short_rail, now))
+            self._insert_pair(db, pair_id, long_owner, short_owner, quantity,
+                              oracle["mark_price"], long_margin, short_margin, long_rail, short_rail, now)
             return dict(pair_id=pair_id, entry_price=oracle["mark_price"], quantity=quantity,
                         initial_margin_required=minimum, entry_fees=fees, oracle_sequence=oracle["sequence"])
 
@@ -307,11 +332,62 @@ class PerpetualEngine:
         return self._mutate(request_id, "liquidate", dict(pair_id=pair_id), now,
                             lambda db: self._settle(db, self._pair(db, pair_id), now, liquidation=True))
 
+    def reduce_pair(self, request_id, pair_id, owner, quantity, now):
+        identifier(owner, "owner")
+        integer(quantity, "quantity", 1)
+
+        def action(db):
+            pair = dict(self._pair(db, pair_id))
+            if owner not in (pair["long_owner"], pair["short_owner"]):
+                raise ProtocolError("owner is not a counterparty")
+            if quantity > pair["quantity"]:
+                raise ProtocolError("reduction exceeds open quantity")
+            if quantity == pair["quantity"]:
+                return self._settle(db, pair, now, liquidation=False)
+            oracle = self._oracle(db, now)
+            before = self._risk(pair, oracle["mark_price"])
+            if before["long_liquidatable"] or before["short_liquidatable"]:
+                raise ProtocolError("resolve liquidatable pairs through full settlement")
+            part = dict(pair, quantity=quantity)
+            for column in ("long_margin", "short_margin"):
+                part[column] = pair[column] * quantity // pair["quantity"]
+            funding = abs(pair["funding_long"]) * quantity // pair["quantity"]
+            part["funding_long"] = funding if pair["funding_long"] >= 0 else -funding
+            remaining = dict(pair, quantity=pair["quantity"] - quantity)
+            for column in ("long_margin", "short_margin", "funding_long"):
+                remaining[column] = pair[column] - part[column]
+            slice_risk = self._risk(part, oracle["mark_price"])
+            if min(slice_risk["long_equity"], slice_risk["short_equity"]) < 0:
+                raise ProtocolError("partial reduction cannot fund negative slice equity")
+            after = self._risk(remaining, oracle["mark_price"])
+            if after["long_liquidatable"] or after["short_liquidatable"]:
+                raise ProtocolError("rounded residual would fall below maintenance")
+            result = self._distribute(db, part, slice_risk)
+            db.execute("UPDATE perp_pairs SET quantity=?,long_margin=?,short_margin=?,funding_long=? WHERE id=?",
+                       (remaining["quantity"], remaining["long_margin"], remaining["short_margin"], remaining["funding_long"], pair_id))
+            return dict(result, status="open", oracle_sequence=oracle["sequence"],
+                        closed_quantity=quantity, remaining_quantity=remaining["quantity"],
+                        long_realized_pnl=slice_risk["long_unrealized_pnl"],
+                        short_realized_pnl=slice_risk["short_unrealized_pnl"],
+                        execution="mock_mark_partial_pair", remaining_risk=after)
+
+        return self._mutate(request_id, "reduce_pair", dict(pair_id=pair_id, owner=owner, quantity=quantity), now, action)
+
     def _settle(self, db, pair, now, liquidation):
         oracle = self._oracle(db, now)
         risk = self._risk(pair, oracle["mark_price"])
         if liquidation and not (risk["long_liquidatable"] or risk["short_liquidatable"]):
             raise ProtocolError("neither side is below maintenance margin")
+        result = self._distribute(db, pair, risk)
+        status = "liquidated" if liquidation else "closed"
+        db.execute("UPDATE perp_pairs SET status=? WHERE id=?", (status, pair["id"]))
+        return dict(result, status=status, oracle_sequence=oracle["sequence"],
+                    closed_quantity=pair["quantity"], remaining_quantity=0,
+                    long_realized_pnl=risk["long_unrealized_pnl"],
+                    short_realized_pnl=risk["short_unrealized_pnl"],
+                    execution="mock_mark_full_pair")
+
+    def _distribute(self, db, pair, risk):
         insurance_used = min(self._meta(db, "insurance"), risk["deficit"])
         uncovered = risk["deficit"] - insurance_used
         pool = integer(pair["long_margin"] + pair["short_margin"] + insurance_used, "settlement pool")
@@ -327,14 +403,12 @@ class PerpetualEngine:
         self._set_meta(db, "insurance", self._meta(db, "insurance") - insurance_used)
         self._set_meta(db, "fees", self._meta(db, "fees") + sum(exit_fees.values()))
         self._set_meta(db, "uncovered_loss", self._meta(db, "uncovered_loss") + uncovered)
-        status = "liquidated" if liquidation else "closed"
-        db.execute("UPDATE perp_pairs SET status=? WHERE id=?", (status, pair["id"]))
-        return dict(pair_id=pair["id"], status=status, oracle_sequence=oracle["sequence"],
+        return dict(pair_id=pair["id"],
                     **risk, insurance_used=insurance_used, uncovered_loss=uncovered,
                     long_haircut=max(0, risk["long_equity"]) - long_gross,
                     short_haircut=max(0, risk["short_equity"]) - short_gross,
                     long_payout=long_paid, short_payout=short_paid, exit_fees=exit_fees,
-                    execution="mock_mark_full_pair", liquidation_penalty=0)
+                    liquidation_penalty=0)
 
     def _assert_invariants(self, db):
         if db.execute("SELECT value FROM perp_config WHERE id=1").fetchone()[0] != canonical(asdict(self.config)):
@@ -350,6 +424,12 @@ class PerpetualEngine:
             if pair["status"] == "open":
                 held += pair["long_margin"] + pair["short_margin"]
         held += self._meta(db, "fees") + self._meta(db, "insurance")
+        for order in db.execute("SELECT * FROM perp_orders"):
+            integer(order["remaining"], "remaining order quantity", 0, order["quantity"])
+            target = self._order_reserve(order, order["remaining"]) if order["status"] == "open" else 0
+            if order["reserved"] != target:
+                raise ProtocolError("perpetual order reserve invariant failed")
+            held += target
         if held != funded:
             raise ProtocolError("perpetual collateral conservation failure")
         return dict(net_simulated_funding=funded, held_collateral=held)
@@ -367,9 +447,12 @@ class PerpetualEngine:
     @staticmethod
     def _state_commitment(db):
         data = {}
-        for table, order in (("perp_meta", "key"), ("perp_config", "id"),
-                             ("perp_accounts", "owner"), ("perp_funding_log", "seq"),
-                             ("perp_oracle", "id"), ("perp_pairs", "seq")):
+        tables = [("perp_meta", "key"), ("perp_config", "id"),
+                  ("perp_accounts", "owner"), ("perp_funding_log", "seq"),
+                  ("perp_oracle", "id"), ("perp_pairs", "seq")]
+        if PerpetualEngine._meta(db, "schema") >= 2:
+            tables.append(("perp_orders", "seq"))
+        for table, order in tables:
             data[table] = [dict(r) for r in db.execute(f"SELECT * FROM {table} ORDER BY {order}")]
         return digest(data)
 
@@ -382,22 +465,26 @@ class PerpetualEngine:
         with self.store._db() as db:
             totals = self._assert_invariants(db)
             self._verify_state(db)
-            previous = "0" * 64
-            count = 0
-            for row in db.execute("SELECT * FROM perp_receipts ORDER BY seq"):
-                count += 1
-                body = self._payload(row)
-                if (digest(body) != row["hash"] or body.get("previous_hash") != previous
-                        or body.get("sequence") != count or row["seq"] != count
-                        or body.get("request_id") != row["request_id"]
-                        or body.get("request_hash") != row["request_hash"]
-                        or body.get("config_hash") != self.config_hash):
-                    raise ProtocolError("perpetual receipt chain integrity failure")
-                previous = row["hash"]
+            count, previous = self._receipt_chain(db)
             return dict(mode="simulation", market=PERP_MARKET, conservation="passed",
                         receipt_chain="passed", state_commitment="passed", receipts=count, head=previous,
                         uncovered_loss=self._meta(db, "uncovered_loss"), **totals,
                         chain_anchor=False, cryptographic_ownership=False)
+
+    def _receipt_chain(self, db):
+        previous = "0" * 64
+        count = 0
+        for row in db.execute("SELECT * FROM perp_receipts ORDER BY seq"):
+            count += 1
+            body = self._payload(row)
+            if (digest(body) != row["hash"] or body.get("previous_hash") != previous
+                    or body.get("sequence") != count or row["seq"] != count
+                    or body.get("request_id") != row["request_id"]
+                    or body.get("request_hash") != row["request_hash"]
+                    or body.get("config_hash") != self.config_hash):
+                raise ProtocolError("perpetual receipt chain integrity failure")
+            previous = row["hash"]
+        return count, previous
 
     def state(self):
         with self.store._db() as db:
@@ -407,4 +494,5 @@ class PerpetualEngine:
                         oracle=None if oracle is None else dict(oracle),
                         accounts=[dict(r) for r in db.execute("SELECT * FROM perp_accounts ORDER BY owner")],
                         pairs=[dict(r) for r in db.execute("SELECT * FROM perp_pairs ORDER BY seq")],
+                        orders=[dict(r) for r in db.execute("SELECT * FROM perp_orders ORDER BY seq")],
                         receipts=[{**json.loads(r["payload"]), "hash": r["hash"]} for r in db.execute("SELECT * FROM perp_receipts ORDER BY seq")])

@@ -57,11 +57,36 @@ def perps_demo():
                     audit=engine.audit(), state=engine.state(), live_broadcast=False)
 
 
+def orders_demo():
+    from .perps import PerpetualEngine
+    with tempfile.TemporaryDirectory(prefix="static-orders-demo-") as folder:
+        engine = PerpetualEngine(Path(folder) / "orders.sqlite")
+        for owner in ("alice", "bob", "carol"):
+            engine.fund_account("deposit-"+owner, owner, 500000, 0)
+        engine.publish_oracle("o1", 10000, 10000, 0, 0)
+        engine.place_order("long-order", "alice", "long-1", "long", 5, 10100, 3000, 10000, 0)
+        engine.place_order("short-order-1", "bob", "short-1", "short", 3, 9900, 3000, 10000, 0)
+        engine.place_order("short-order-2", "carol", "short-1", "short", 2, 9950, 3000, 10000, 0)
+        matched = engine.match_orders("match-1", 0)
+        pair_id = matched["result"]["matches"][0]["pair_id"]
+        engine.publish_oracle("o2", 10051, 10000, 3600, 3600)
+        funding = engine.settle_funding("funding-1", 1, 100, 3600)
+        engine.publish_oracle("o3", 10200, 10200, 3601, 3601)
+        reduced = engine.reduce_pair("reduce-1", pair_id, "alice", 1, 3601)
+        closed = engine.close_pair("close-1", pair_id, "alice", 3601)
+        other = matched["result"]["matches"][1]["pair_id"]
+        engine.close_pair("close-2", other, "carol", 3601)
+        return dict(version=__version__, mode="simulation", matched=matched,
+                    funding=funding, reduced=reduced, closed=closed,
+                    audit=engine.audit(), state=engine.state(), live_broadcast=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description="STATIC local reference engine: simulated assets only")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("demo", help="run an isolated complete example")
     commands.add_parser("perps-demo", help="run a simulated long/short, funding, and liquidation example")
+    commands.add_parser("orders-demo", help="match perpetual limit orders and partially close a pair")
     serve = commands.add_parser("serve", help="start the loopback operator API")
     serve.add_argument("--db", default="static-sim.sqlite")
     serve.add_argument("--port", type=int, default=8787)
@@ -74,6 +99,8 @@ def main():
         print(json.dumps(demo(), indent=2))
     elif args.command == "perps-demo":
         print(json.dumps(perps_demo(), indent=2))
+    elif args.command == "orders-demo":
+        print(json.dumps(orders_demo(), indent=2))
     elif args.command == "audit":
         print(json.dumps(Engine(args.db).audit(), indent=2))
     elif args.command == "perps-audit":
