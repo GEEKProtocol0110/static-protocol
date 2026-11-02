@@ -1,6 +1,6 @@
 # Project checkpoint
 
-Version: 0.2.0
+Version: 0.3.0
 
 ## Completed
 
@@ -19,15 +19,21 @@ Version: 0.2.0
 - Added bounded mock index/mark snapshots, sequential funding, modeled full-pair
   liquidation, finite insurance and explicit uncovered-loss payout haircuts.
 - Added perpetual mutation retries, complete state commitments, HTTP endpoints,
-  a worked demo and a risk specification. The full suite now has 89 tests.
+  a worked demo and a risk specification.
+- Added reserved perpetual limit orders, rotating admission, limit-protected
+  mock-mark matching, cancellation and expiry.
+- Added exact partial pair reductions, signed funding allocation, residual
+  maintenance checks and verified v0.2 database migration.
+- The full suite now has 126 tests. Three CLI demos cover spot, liquidation,
+  and the order-to-partial-close flow.
 
 ## Next perpetuals milestone
 
-Replace operator-paired entries with limit-price order matching; implement
-partial reductions with exact realized PnL and margin release. Then specify
-authenticated price/rate inputs, funding scheduling and executable liquidation
-slippage. The current simulator closes both sides of a pair at a mock mark;
-it is not a production derivatives venue. See PERPETUALS.md.
+Specify authenticated price/rate inputs, funding scheduling and executable
+liquidation slippage. Define price discovery and counterparty reassignment
+before claiming an exchange order book. Current limit orders match at a mock
+mark, and reductions shrink both sides of a pair. See PERPETUALS.md and
+[ORDERS-AND-REDUCTIONS.md](ORDERS-AND-REDUCTIONS.md).
 
 ## Next milestone: one verifiable Kaspa intake buffer
 

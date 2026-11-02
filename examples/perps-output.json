@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "mode": "simulation",
   "opened": {
     "version": 1,
@@ -10,9 +10,10 @@
     "request_hash": "7f580abeaf05a0c78fa55520fcf4075c81e61438bc8c7b283b392083a9aea8bd",
     "kind": "open_pair",
     "now": 0,
+    "schema": 2,
     "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
-    "previous_hash": "852a511e13df65661e9f4d64f7740298ac99df2cef76a3e1e2d9a1b1f86e7ac9",
-    "state_hash": "084262bcf30152a700311930a342688734856944999cd9d5dd6fdf1a0a9bf367",
+    "previous_hash": "cccedccf69fa52554350972458337949e62be7fbc8fddbde430a299e467528e7",
+    "state_hash": "cc7f64fb9d31fb1282ab7e2975586d2e76757747398a8a9179bdc7e2f8b17a92",
     "result": {
       "pair_id": "610261c733892b0a11f31eede658fb1e1b284a04c5c59bc17b08f40f20f4aeee",
       "entry_price": 10000,
@@ -24,7 +25,7 @@
       },
       "oracle_sequence": 1
     },
-    "hash": "5196252c25f778374c41fb11e6e7341bca0f22e0270e63d4da590daf478401c9"
+    "hash": "e7823078f2008feea637d30204c7454368d8b1b679dc2aca1b3e0d55e1abbf4c"
   },
   "initial_risk": {
     "pair_id": "610261c733892b0a11f31eede658fb1e1b284a04c5c59bc17b08f40f20f4aeee",
@@ -51,9 +52,10 @@
     "request_hash": "edb21dae8c9562674a29de72c75d518507fb846c4527c188bfe7e045c6385c9f",
     "kind": "funding",
     "now": 3600,
+    "schema": 2,
     "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
-    "previous_hash": "7a45665453dd14c1ad6147d661fb2af0990e1f5f7bc8084ff86fe1e7336f11fe",
-    "state_hash": "8cd947b729a43b9ca1c5c3852b34eebf7c7cfa7d3823ff5dbaf1d3f09ca94b57",
+    "previous_hash": "cf011a5e5869ff71ea97506717bb1d4a233b492afbe3157b3e34713eace08bd3",
+    "state_hash": "9035c30480599d7e34befe853ca9cca71c7c636de84b3b10297adf33ab1189ef",
     "result": {
       "epoch": 1,
       "rate_bps": 10,
@@ -68,7 +70,7 @@
       ],
       "protocol_funding_fee": 0
     },
-    "hash": "0c5e0ca27108f89c87e6aaf6faa53f74f986c0b24133b3c3ac34ffec020f394e"
+    "hash": "6e557e96aa3d98840bcc529c8ccfa88b00ecb8ea19a428d1b608f7ae8cdab1e6"
   },
   "liquidation": {
     "version": 1,
@@ -79,13 +81,12 @@
     "request_hash": "65d0db3c37df7f2dc8146ac9fbf2f8b86f08ceadf9c635619546bbcdc3aab85f",
     "kind": "liquidate",
     "now": 3601,
+    "schema": 2,
     "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
-    "previous_hash": "2bf61c383ed5c320c8508adee3c5f3eedb81bce7337704de5a5568a5f39363ad",
-    "state_hash": "049a2ece9fb7f2368483551296b966a8bee34d70718e49e13056ad15c2702af6",
+    "previous_hash": "9e0dd932e4bf633f7008166ea87097553af109d690c893e549f327a89b097dc2",
+    "state_hash": "c990fb788db124a3af004a1fe545cd5f8662572eba1f50605a7c93cb89d4bff8",
     "result": {
       "pair_id": "610261c733892b0a11f31eede658fb1e1b284a04c5c59bc17b08f40f20f4aeee",
-      "status": "liquidated",
-      "oracle_sequence": 3,
       "mark_price": 12500,
       "notional": 125000,
       "long_unrealized_pnl": 25000,
@@ -107,10 +108,16 @@
         "long": 63,
         "short": 63
       },
-      "execution": "mock_mark_full_pair",
-      "liquidation_penalty": 0
+      "liquidation_penalty": 0,
+      "status": "liquidated",
+      "oracle_sequence": 3,
+      "closed_quantity": 10,
+      "remaining_quantity": 0,
+      "long_realized_pnl": 25000,
+      "short_realized_pnl": -25000,
+      "execution": "mock_mark_full_pair"
     },
-    "hash": "652b76d6d6c1e3b7077e58f2978790dd13d37a2d0f4e5d62f2105bf43e7e6628"
+    "hash": "5acf19292162c1ce3f5e251b63c801d3a9a43cf130d09e861e998ee12756b652"
   },
   "audit": {
     "mode": "simulation",
@@ -119,7 +126,7 @@
     "receipt_chain": "passed",
     "state_commitment": "passed",
     "receipts": 10,
-    "head": "652b76d6d6c1e3b7077e58f2978790dd13d37a2d0f4e5d62f2105bf43e7e6628",
+    "head": "5acf19292162c1ce3f5e251b63c801d3a9a43cf130d09e861e998ee12756b652",
     "uncovered_loss": 0,
     "net_simulated_funding": 1050000,
     "held_collateral": 1050000,
@@ -143,7 +150,8 @@
       "funding_at": 3600,
       "funding_epoch": 1,
       "insurance": 50000,
-      "schema": 1,
+      "orders_cursor": 0,
+      "schema": 2,
       "time": 3601,
       "uncovered_loss": 0
     },
@@ -181,6 +189,7 @@
         "status": "liquidated"
       }
     ],
+    "orders": [],
     "receipts": [
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -197,10 +206,11 @@
           "direction": "in",
           "owner": "alice"
         },
+        "schema": 2,
         "sequence": 1,
-        "state_hash": "90d4e40a5217da32320a4d38afae857d216c6ceb4f38e2b19cdd906d5167946f",
+        "state_hash": "455cbad6ebf6944f4465361c6c6a0e989c8cfac28b1b72507ca21f5ded7c5d1d",
         "version": 1,
-        "hash": "38e8f3e86646a22b9fb417cbd4e13a11f912f9c846a56e8ace7fdde823238809"
+        "hash": "4c89d451da9e34757f457949ebde02ec04ddce172f0344eb189570e6ac4839dc"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -208,7 +218,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 0,
-        "previous_hash": "38e8f3e86646a22b9fb417cbd4e13a11f912f9c846a56e8ace7fdde823238809",
+        "previous_hash": "4c89d451da9e34757f457949ebde02ec04ddce172f0344eb189570e6ac4839dc",
         "request_hash": "2a4be7ade411f52640b2c35da8f4b16ed32dd43eeccba5187d00c615cef4d409",
         "request_id": "deposit-short",
         "result": {
@@ -217,10 +227,11 @@
           "direction": "in",
           "owner": "bob"
         },
+        "schema": 2,
         "sequence": 2,
-        "state_hash": "b35a10edeb42441a83defa79db42d64d5ccf1ed7f6a05902bac913fe98b063a9",
+        "state_hash": "e4894288c9cd2d109d86ed1470f5f26f3ecca2b9dec1ba6eacc434e101cf2d05",
         "version": 1,
-        "hash": "f398a969354ac3bdd9469a3a4bb6e778ba18be424bc265f3c080c1b3085c2793"
+        "hash": "44b8dcf66ff71e65760449d986d38a134692bf3e5ff54648d16874c676a957bc"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -228,17 +239,18 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 0,
-        "previous_hash": "f398a969354ac3bdd9469a3a4bb6e778ba18be424bc265f3c080c1b3085c2793",
+        "previous_hash": "44b8dcf66ff71e65760449d986d38a134692bf3e5ff54648d16874c676a957bc",
         "request_hash": "11bb82c5b1e67a25d667e5d5ea2f3da0c96c56d786f80f7405a29a4327593908",
         "request_id": "insurance",
         "result": {
           "amount": 50000,
           "asset": "USD_TEST"
         },
+        "schema": 2,
         "sequence": 3,
-        "state_hash": "b2d3b16f806f6bca62227b866aca44af3c01d5b7f2d12299c445b14a1ccaef4f",
+        "state_hash": "45049b148eb83b7067122e25839393984b7170ccc1db255440e28e2c468e88a8",
         "version": 1,
-        "hash": "a80203bf8a6d4e6b35ccfd244f33761fe13a89f6ee529e85dc47f9d643d425a4"
+        "hash": "268b8132c7cd544d27cb8808d2505977b65cd5c6c341f0f29ca5dfa046e18eda"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -246,7 +258,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 0,
-        "previous_hash": "a80203bf8a6d4e6b35ccfd244f33761fe13a89f6ee529e85dc47f9d643d425a4",
+        "previous_hash": "268b8132c7cd544d27cb8808d2505977b65cd5c6c341f0f29ca5dfa046e18eda",
         "request_hash": "a8e38ecadb9f428702cb87429ab372f9d9c50319565e9ab6d40987561676b090",
         "request_id": "oracle-1",
         "result": {
@@ -256,10 +268,11 @@
           "observed_at": 0,
           "sequence": 1
         },
+        "schema": 2,
         "sequence": 4,
-        "state_hash": "54ad840d0a09cfbe4c4bdb9cb1bba05716e08055ae0e32531d2d104fdb4b7f6d",
+        "state_hash": "6c6dd91042e87095328c4f87b2a18512641e19a1ee6c716a639020b79241f5d7",
         "version": 1,
-        "hash": "852a511e13df65661e9f4d64f7740298ac99df2cef76a3e1e2d9a1b1f86e7ac9"
+        "hash": "cccedccf69fa52554350972458337949e62be7fbc8fddbde430a299e467528e7"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -267,7 +280,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 0,
-        "previous_hash": "852a511e13df65661e9f4d64f7740298ac99df2cef76a3e1e2d9a1b1f86e7ac9",
+        "previous_hash": "cccedccf69fa52554350972458337949e62be7fbc8fddbde430a299e467528e7",
         "request_hash": "7f580abeaf05a0c78fa55520fcf4075c81e61438bc8c7b283b392083a9aea8bd",
         "request_id": "pair-1",
         "result": {
@@ -281,10 +294,11 @@
           "pair_id": "610261c733892b0a11f31eede658fb1e1b284a04c5c59bc17b08f40f20f4aeee",
           "quantity": 10
         },
+        "schema": 2,
         "sequence": 5,
-        "state_hash": "084262bcf30152a700311930a342688734856944999cd9d5dd6fdf1a0a9bf367",
+        "state_hash": "cc7f64fb9d31fb1282ab7e2975586d2e76757747398a8a9179bdc7e2f8b17a92",
         "version": 1,
-        "hash": "5196252c25f778374c41fb11e6e7341bca0f22e0270e63d4da590daf478401c9"
+        "hash": "e7823078f2008feea637d30204c7454368d8b1b679dc2aca1b3e0d55e1abbf4c"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -292,7 +306,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 3600,
-        "previous_hash": "5196252c25f778374c41fb11e6e7341bca0f22e0270e63d4da590daf478401c9",
+        "previous_hash": "e7823078f2008feea637d30204c7454368d8b1b679dc2aca1b3e0d55e1abbf4c",
         "request_hash": "38d78c74b5aa2941282f499c306d44fbf118d3b8d6fc19f8cc5537591b5cb822",
         "request_id": "oracle-2",
         "result": {
@@ -302,10 +316,11 @@
           "observed_at": 3600,
           "sequence": 2
         },
+        "schema": 2,
         "sequence": 6,
-        "state_hash": "6e93be1f352471da4fe098edb3c559e973b1e25ed074ac54a62b9b45ef665df3",
+        "state_hash": "2b2e19c5634a7403f0db89c1e9132e2e33012a5d5f3efeefb87830e266cd18be",
         "version": 1,
-        "hash": "7a45665453dd14c1ad6147d661fb2af0990e1f5f7bc8084ff86fe1e7336f11fe"
+        "hash": "cf011a5e5869ff71ea97506717bb1d4a233b492afbe3157b3e34713eace08bd3"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -313,7 +328,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 3600,
-        "previous_hash": "7a45665453dd14c1ad6147d661fb2af0990e1f5f7bc8084ff86fe1e7336f11fe",
+        "previous_hash": "cf011a5e5869ff71ea97506717bb1d4a233b492afbe3157b3e34713eace08bd3",
         "request_hash": "edb21dae8c9562674a29de72c75d518507fb846c4527c188bfe7e045c6385c9f",
         "request_id": "funding-1",
         "result": {
@@ -330,10 +345,11 @@
           "protocol_funding_fee": 0,
           "rate_bps": 10
         },
+        "schema": 2,
         "sequence": 7,
-        "state_hash": "8cd947b729a43b9ca1c5c3852b34eebf7c7cfa7d3823ff5dbaf1d3f09ca94b57",
+        "state_hash": "9035c30480599d7e34befe853ca9cca71c7c636de84b3b10297adf33ab1189ef",
         "version": 1,
-        "hash": "0c5e0ca27108f89c87e6aaf6faa53f74f986c0b24133b3c3ac34ffec020f394e"
+        "hash": "6e557e96aa3d98840bcc529c8ccfa88b00ecb8ea19a428d1b608f7ae8cdab1e6"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -341,7 +357,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 3600,
-        "previous_hash": "0c5e0ca27108f89c87e6aaf6faa53f74f986c0b24133b3c3ac34ffec020f394e",
+        "previous_hash": "6e557e96aa3d98840bcc529c8ccfa88b00ecb8ea19a428d1b608f7ae8cdab1e6",
         "request_hash": "c61388823c8268bd448e7d154ebbe7e5d922c403368419b2646d31340365699d",
         "request_id": "top-up-1",
         "result": {
@@ -350,10 +366,11 @@
           "owner": "bob",
           "pair_id": "610261c733892b0a11f31eede658fb1e1b284a04c5c59bc17b08f40f20f4aeee"
         },
+        "schema": 2,
         "sequence": 8,
-        "state_hash": "0157d8e10b8d9e1258515c6b1ab57134496fefd3122d7bbc6c2a6711d311ba85",
+        "state_hash": "9f56ec5b38424e608847504da896e4283e1442429ce0db8ac844f8caa0dd9f80",
         "version": 1,
-        "hash": "93b9d555eae773b76a2241f17b2ea5a75b9126a500c8aa08b96e877db77466cb"
+        "hash": "6600023b6867e28ce508d198155bdcf2f60b3c78e1606ce65fac2a41738712bc"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -361,7 +378,7 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 3601,
-        "previous_hash": "93b9d555eae773b76a2241f17b2ea5a75b9126a500c8aa08b96e877db77466cb",
+        "previous_hash": "6600023b6867e28ce508d198155bdcf2f60b3c78e1606ce65fac2a41738712bc",
         "request_hash": "49fc1d3dc958f698f5f0dbb2576c7e6ab6711b5b7588bfd17875025b3b4507b5",
         "request_id": "oracle-3",
         "result": {
@@ -371,10 +388,11 @@
           "observed_at": 3601,
           "sequence": 3
         },
+        "schema": 2,
         "sequence": 9,
-        "state_hash": "e5613c6633d109becb1ad622489da1dc7814188efc75b0cd73098a85e1e8422e",
+        "state_hash": "9b662a955fd944fe32ac739cff8b9f17aed6dde66fcb7566be8d3b1ff4b3b9fa",
         "version": 1,
-        "hash": "2bf61c383ed5c320c8508adee3c5f3eedb81bce7337704de5a5568a5f39363ad"
+        "hash": "9e0dd932e4bf633f7008166ea87097553af109d690c893e549f327a89b097dc2"
       },
       {
         "config_hash": "4ae957c0692cb347c9944b64224a28e99a806662030b49708276f29187d74079",
@@ -382,10 +400,11 @@
         "market": "STATIC_TEST-PERP/USD_TEST",
         "mode": "simulation",
         "now": 3601,
-        "previous_hash": "2bf61c383ed5c320c8508adee3c5f3eedb81bce7337704de5a5568a5f39363ad",
+        "previous_hash": "9e0dd932e4bf633f7008166ea87097553af109d690c893e549f327a89b097dc2",
         "request_hash": "65d0db3c37df7f2dc8146ac9fbf2f8b86f08ceadf9c635619546bbcdc3aab85f",
         "request_id": "liquidation-1",
         "result": {
+          "closed_quantity": 10,
           "deficit": 0,
           "execution": "mock_mark_full_pair",
           "exit_fees": {
@@ -399,24 +418,28 @@
           "long_haircut": 0,
           "long_liquidatable": false,
           "long_payout": 44837,
+          "long_realized_pnl": 25000,
           "long_unrealized_pnl": 25000,
           "maintenance_each": 12500,
           "mark_price": 12500,
           "notional": 125000,
           "oracle_sequence": 3,
           "pair_id": "610261c733892b0a11f31eede658fb1e1b284a04c5c59bc17b08f40f20f4aeee",
+          "remaining_quantity": 0,
           "short_equity": 100,
           "short_haircut": 0,
           "short_liquidatable": true,
           "short_payout": 37,
+          "short_realized_pnl": -25000,
           "short_unrealized_pnl": -25000,
           "status": "liquidated",
           "uncovered_loss": 0
         },
+        "schema": 2,
         "sequence": 10,
-        "state_hash": "049a2ece9fb7f2368483551296b966a8bee34d70718e49e13056ad15c2702af6",
+        "state_hash": "c990fb788db124a3af004a1fe545cd5f8662572eba1f50605a7c93cb89d4bff8",
         "version": 1,
-        "hash": "652b76d6d6c1e3b7077e58f2978790dd13d37a2d0f4e5d62f2105bf43e7e6628"
+        "hash": "5acf19292162c1ce3f5e251b63c801d3a9a43cf130d09e861e998ee12756b652"
       }
     ]
   },

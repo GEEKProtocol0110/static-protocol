@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="380" viewBox="0 0 1280 380" role="img" aria-labelledby="title desc">
   <title id="title">STATIC Protocol</title>
-  <desc id="desc">Settlement research for Kaspa. Batch settlement, isolated perpetuals, treasury research. Version 0.2.0 reference engine, simulated assets.</desc>
+  <desc id="desc">Settlement research for Kaspa. Batch settlement, isolated perpetuals, treasury research. Version 0.3.0 reference engine, simulated assets.</desc>
   <defs>
     <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#081725"/><stop offset="1" stop-color="#102a37"/></linearGradient>
     <linearGradient id="accent"><stop stop-color="#6ff3d3"/><stop offset="1" stop-color="#44a7d5"/></linearGradient>
@@ -19,7 +19,7 @@
   <text x="69" y="248" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" fill="#a0bdc8">Batch settlement. Isolated perpetuals. Treasury research.</text>
   <rect x="68" y="293" width="452" height="35" rx="6" fill="#153a44" stroke="#28545e"/>
   <circle cx="87" cy="310" r="4" fill="#6ff3d3"/>
-  <text x="102" y="316" font-family="DejaVu Sans Mono,monospace" font-size="12" letter-spacing="1" fill="#bfe9e2">v0.2.0 / REFERENCE ENGINE / SIMULATED ASSETS</text>
+  <text x="102" y="316" font-family="DejaVu Sans Mono,monospace" font-size="12" letter-spacing="1" fill="#bfe9e2">v0.3.0 / REFERENCE ENGINE / SIMULATED ASSETS</text>
   <g fill="none" stroke="#63dbca" stroke-width="2">
     <path d="M864 70H927L967 111H1122M864 140H927L967 111M864 210H927L967 249H1122M864 280H927L967 249" opacity=".32"/>
     <path d="M1002 111V249" opacity=".32"/>

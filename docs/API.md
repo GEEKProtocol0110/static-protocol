@@ -46,7 +46,7 @@ idempotency keys; retrying one credits/debits again. The example uses distinct
 account names for repeatable runs. Read endpoints return the full dataset;
 pagination, rate limiting and public-service hardening are outside this build.
 
-## Perpetuals simulator (v0.2.0)
+## Perpetuals simulator (v0.3.0)
 
 The same token authorizes these routes. Perpetual `USD_TEST` collateral is
 separate from spot balances. Each mutation requires a unique `request_id` and
@@ -62,9 +62,13 @@ is retry-safe, unlike the original spot funding endpoint.
 | POST | `/v1/perps/insurance` | `request_id`, `amount`, `now` |
 | POST | `/v1/perps/oracle` | `request_id`, `index_price`, `mark_price`, `observed_at`, `now` |
 | POST | `/v1/perps/open` | `request_id`, `long_owner`, `short_owner`, `quantity`, `long_margin`, `short_margin`, `now`; optional `long_rail`/`short_rail` |
+| POST | `/v1/perps/orders` | `request_id`, `owner`, `nonce`, `side`, `quantity`, `limit_price`, `margin_per_lot`, `expires_at`, `now`; optional `fee_rail` |
+| POST | `/v1/perps/orders/cancel` | `request_id`, `order_id`, `owner`, `now` |
+| POST | `/v1/perps/match` | `request_id`, `now`; optional `max_inputs` (1-80, default 80) |
 | POST | `/v1/perps/top-up` | `request_id`, `pair_id`, `owner`, `amount`, `now` |
 | POST | `/v1/perps/funding` | `request_id`, `epoch`, `rate_bps`, `now` |
 | POST | `/v1/perps/close` | `request_id`, `pair_id`, `owner`, `now` |
+| POST | `/v1/perps/reduce` | `request_id`, `pair_id`, `owner`, `quantity`, `now` |
 | POST | `/v1/perps/liquidate` | `request_id`, `pair_id`, `now` |
 | POST | `/v1/perps/risk` | `pair_id`, `now`; read-only risk query |
 
@@ -91,3 +95,27 @@ Receipts include `kind`, `now`, `request_hash`, `config_hash`, `state_hash`,
 `previous_hash`, and the transition's `result`. Liquidation results disclose
 equity, maintenance, insurance, uncovered loss, each haircut, fees and payouts.
 See [PERPETUALS.md](PERPETUALS.md) for full assumptions and limitations.
+
+Perpetual order `side` is `long` or `short`. Placement reserves margin and
+worst-case fees without requiring a fresh price. `expires_at` is integer
+simulation time, independent of spot DAA. Matching requires a fresh mock mark;
+each receipt lists admitted IDs and the resulting pair IDs. A short's collateral
+also imposes a maximum fill price. Cancellation refunds pending reserves.
+
+Example intent after depositing collateral:
+
+```json
+{
+  "request_id": "intent-1", "owner": "alice", "nonce": "long-1",
+  "side": "long", "quantity": 5, "limit_price": 10100,
+  "margin_per_lot": 3000, "expires_at": 7200, "now": 0
+}
+```
+
+Place a separately funded short, publish a fresh mark of 10,000, then call
+`/v1/perps/match` with `{"request_id":"match-1","now":0}`. Reduce a returned
+pair with `{"request_id":"reduce-1","pair_id":"<pair_id>","owner":"alice",
+"quantity":1,"now":0}`. This reduces both counterparties. A reduction of the
+entire current quantity uses full-close insurance and haircut rules; a smaller
+slice must leave both sides safe. See
+[ORDERS-AND-REDUCTIONS.md](ORDERS-AND-REDUCTIONS.md).

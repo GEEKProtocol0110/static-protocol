@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0 — Perpetual orders and partial reductions
+
+- Collateralized long/short limit intents with immutable nonce protection,
+  cancellation, expiry, and fee coverage across arbitrary partial fills.
+- Rotating admission of up to 80 orders, deterministic price/time priority
+  within each admitted set, and limit-protected matching at a fresh mock mark.
+- Partial pair reductions with exact realized PnL, proportional margin/funding
+  allocation, retained rounding dust and residual maintenance checks.
+- Verified schema migration preserving all v0.2 receipts and collateral.
+- Four HTTP routes, an orders demo, worked output and a matching specification.
+- 37 additional tests (126 total), including migration, many small fills,
+  concurrent reservations, injected rollback and unsafe rounding cases.
+
+Matching uses an operator-supplied mark. Both paired counterparties reduce
+together. Authenticated prices, price discovery, executable liquidation and
+live settlement remain future work.
+
 ## 0.2.0 — Paired perpetuals simulator
 
 ### Added

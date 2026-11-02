@@ -1,6 +1,6 @@
 # Security boundary
 
-STATIC v0.2.0 is a local simulator. Use fictional balances only. Its checks
+STATIC v0.3.0 is a local simulator. Use fictional balances only. Its checks
 are useful for verifying candidate economics and state transitions, not for
 custody or public exchange operation.
 
@@ -45,12 +45,21 @@ oracle, stablecoin issuer verification, live leveraged trading, gas conversion,
 distributed shared-state enforcement or consensus script.
 
 The paired perpetuals simulator supports isolated margin, funding and modeled
-liquidation. Its operator controls identities, matched counterparties, time,
-prices and rates. Mark/index bounds cannot authenticate a jointly forged feed.
+liquidation, reserved limit orders and partial reductions. Its operator controls
+identities, admission, time, prices and rates. Mark/index bounds cannot
+authenticate a jointly forged feed.
 Both counterparties close at a mock mark without execution or slippage proof.
 Funding has no premium estimator or scheduler. Its finite insurance can run
 out; receipts explicitly record payout haircuts. Unrelated isolated cash is
 not seized to hide those losses. See docs/PERPETUALS.md for the exact rules.
+
+Perpetual limits constrain a fill at the mock mark; they do not establish price
+discovery, fair inclusion, market liquidity or owner authorization. Partial
+reductions settle both counterparties and reject unsafe slices or residuals.
+Order reserves include worst-case partial-fill fee rounding. Schema migration
+verifies legacy state and receipt history before appending its own receipt;
+retain a database backup before opening an older ledger. See
+[orders and reductions](docs/ORDERS-AND-REDUCTIONS.md).
 
 Perpetual receipts also commit to current state, catching uncoordinated
 value-conserving edits such as a changed funding accumulator. An administrator

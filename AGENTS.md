@@ -28,7 +28,14 @@ both counterparties at a mock mark. Preserve funding neutrality, finite
 insurance, explicit loss haircuts and state commitments. Never hide bad debt
 by minting a cash balance or silently taking unrelated isolated collateral.
 
-The next perpetuals milestone is matching and partial reductions; intake-covenant
+Read docs/ORDERS-AND-REDUCTIONS.md before changing order reservations, matching,
+partial-close rounding or schema migration. Include open-order reserves in
+conservation; preserve all legacy receipt hashes during migration. Partial
+reductions must leave both residual sides above maintenance without using
+insurance or hiding deficits.
+
+The next perpetuals milestone is authenticated prices/rates and executable
+liquidation; intake-covenant
 validation remains a separate chain milestone in docs/STATUS.md. Do not present
 live derivatives, foreign collateral, graduation, non-custody, throughput targets,
 or MEV immunity as completed features.

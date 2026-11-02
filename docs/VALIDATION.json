@@ -1,13 +1,13 @@
 {
-  "version": "0.2.0",
-  "validated_at_utc": "2026-10-20T03:51:44.938861+00:00",
+  "version": "0.3.0",
+  "validated_at_utc": "2026-10-20T04:27:01.362104+00:00",
   "runtime": "3.12.14",
   "suite": {
     "command": "python3 -m unittest discover -s tests -v",
-    "passed": 89,
+    "passed": 126,
     "failures": 0,
     "errors": 0,
-    "elapsed_seconds": 7.122
+    "elapsed_seconds": 9.676
   },
   "coverage_scenarios": [
     "prior spot/reserve/treasury suite",
@@ -24,7 +24,17 @@
     "restart recovery",
     "injected settlement rollback",
     "full HTTP funding and gap-liquidation flow",
-    "60 seeded random open/price/close cycles"
+    "60 seeded random open/price/close cycles",
+    "collateralized perpetual order placement, cancellation and expiry",
+    "per-lot fee coverage across many small fills",
+    "rotating admission and limit/price-cap gates",
+    "concurrent matching and competing reservations",
+    "exact partial-close PnL, margin and signed funding allocation",
+    "20 seeded repeated-reduction partitions",
+    "negative slice and unsafe residual rounding rejection",
+    "legacy v0.2 receipt-prefix and collateral preservation",
+    "corrupt legacy state/history rejected atomically",
+    "full HTTP orders, matching, funding and partial-close flow"
   ],
   "demos": {
     "spot": {
@@ -37,11 +47,19 @@
       "collateral": 1050000,
       "conservation": "passed",
       "state_commitment": "passed"
+    },
+    "orders": {
+      "matched_quantity": 5,
+      "matched_pairs": 2,
+      "partial_closed_quantity": 1,
+      "collateral": 1500000,
+      "conservation": "passed",
+      "state_commitment": "passed"
     }
   },
   "not_validated": [
     "live perpetual matching or order execution",
-    "partial close/reduction",
+    "price-discovering perpetual auction or counterparty reassignment",
     "authenticated price or funding-rate input",
     "scheduler or automatic liquidation keeper",
     "SilverScript or node validation",

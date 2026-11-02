@@ -1,16 +1,20 @@
-STATIC v0.2.0 validation
+STATIC v0.3.0 validation
 
 Python 3.12.14
 Command: python3 -m unittest discover -s tests -v
-Result: 89 tests passed; 0 failures; 0 errors; 7.122 seconds.
+Result: 126 tests passed; 0 failures; 0 errors; 9.676 seconds.
 
-Includes the prior 48 spot/reserve/treasury checks and 41 additional perpetual
-and HTTP checks: paired positions, margin, PnL, signed-direction funding,
-liquidation, insurance gaps, explicit loss haircuts, retries, concurrency,
-restart recovery, fault rollback, and receipt/state tampering.
+Includes the prior 89 spot/reserve/treasury/perpetual checks and 37 additional
+checks covering collateralized limit orders, many partial fills, rotating
+admission, concurrent reservations, exact partial-close allocation, signed
+funding dust, unsafe residual rejection, v0.2 schema migration, corrupted
+legacy history/state, injected rollback and the complete HTTP order flow.
 
-Both CLI demos executed successfully. The perpetual demo conserves all
-1,050,000 fictional quote atoms and verifies its current state commitment.
+All three CLI demos executed successfully. The liquidation demo conserves
+1,050,000 fictional quote atoms. The orders demo matches five lots into two
+pairs, partially reduces one pair, closes both and conserves 1,500,000 atoms.
+Both perpetual demos verify their complete current state commitments.
 
-No real funds, live matching, authenticated oracle, automatic keeper,
-covenant compiler, node validation, external audit or formal proof was exercised.
+No real funds, live execution, price discovery, authenticated oracle,
+automatic keeper, covenant compiler, node validation, external audit or
+formal proof was exercised.
