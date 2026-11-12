@@ -7,9 +7,9 @@ custody or public exchange operation.
 ## Reporting a concern
 
 Do not post secrets, exploit credentials, wallet material, or private user data
-in public issues. Use GitHub's private vulnerability reporting if it is enabled
-for this repository. Otherwise, ask the maintainer to arrange a private channel
-before sharing sensitive reproduction details. Ordinary fictional-asset
+in public issues. Use GitHub's private vulnerability reporting, which is now
+enabled for this repository. Otherwise, ask the maintainer to arrange a private
+channel before sharing sensitive reproduction details. Ordinary fictional-asset
 accounting bugs can use the bug report form.
 
 ## Trust assumptions
